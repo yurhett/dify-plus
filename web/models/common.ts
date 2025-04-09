@@ -186,9 +186,15 @@ export enum DataSourceCategory {
 export enum DataSourceProvider {
   fireCrawl = 'firecrawl',
   jinaReader = 'jinareader',
+  waterCrawl = 'watercrawl',
 }
 
 export type FirecrawlConfig = {
+  api_key: string
+  base_url: string
+}
+
+export type WatercrawlConfig = {
   api_key: string
   base_url: string
 }

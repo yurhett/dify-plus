@@ -162,6 +162,8 @@ const EmbeddedChatbotWrapper = () => {
     setClearChatList,
     isResponding,
     setIsResponding,
+    currentConversationInputs,
+    setCurrentConversationInputs,
   } = useEmbeddedChatbot()
 
   return <EmbeddedChatbotContext.Provider value={{
@@ -195,6 +197,8 @@ const EmbeddedChatbotWrapper = () => {
     setClearChatList,
     isResponding,
     setIsResponding,
+    currentConversationInputs,
+    setCurrentConversationInputs,
   }}>
     <Chatbot />
   </EmbeddedChatbotContext.Provider>

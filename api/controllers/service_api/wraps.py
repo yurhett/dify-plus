@@ -72,22 +72,32 @@ def validate_app_token(view: Optional[Callable] = None, *, fetch_user_arg: Optio
             if tenant.status == TenantStatus.ARCHIVE:
                 raise Forbidden("The workspace's status is archived.")
 
-            # ---------------------二开部分Begin  额度限制，API调用计费 ---------------------
-            tenantAccountJoin = (
-                db.session.query(TenantAccountJoin)
-                .filter(
-                    TenantAccountJoin.tenant_id == app_model.tenant_id,
-                    TenantAccountJoin.role == TenantAccountRole.OWNER,
-                )
-                .first()
-            )
-            if not tenantAccountJoin:
-                raise Forbidden("The workspace has not owner")
+            tenant_account_join = (
+                db.session.query(Tenant, TenantAccountJoin)
+                .filter(Tenant.id == api_token.tenant_id)
+                .filter(TenantAccountJoin.tenant_id == Tenant.id)
+                .filter(TenantAccountJoin.role.in_(["owner"]))
+                .filter(Tenant.status == TenantStatus.NORMAL)
+                .one_or_none()
+            )  # TODO: only owner information is required, so only one is returned.
+            if tenant_account_join:
+                tenant, ta = tenant_account_join
+                account = db.session.query(Account).filter(Account.id == ta.account_id).first()
+                # Login admin
+                if account:
+                    account.current_tenant = tenant
+                    current_app.login_manager._update_request_context_with_user(account)  # type: ignore
+                    user_logged_in.send(current_app._get_current_object(), user=_get_user())  # type: ignore
+                else:
+                    raise Unauthorized("Tenant owner account does not exist.")
+            else:
+                raise Unauthorized("Tenant does not exist.")
 
+            # ---------------------二开部分Begin  额度限制，API调用计费 ---------------------
             # TODO 需要写入缓存，读缓存
             account_money = (
                 db.session.query(AccountMoneyExtend)
-                .filter(AccountMoneyExtend.account_id == tenantAccountJoin.account_id)
+                .filter(AccountMoneyExtend.account_id == tenant_account_join.account_id)
                 .first()
             )
             if account_money and account_money.used_quota >= account_money.total_quota:
@@ -137,7 +147,7 @@ def validate_app_token(view: Optional[Callable] = None, *, fetch_user_arg: Optio
                 # ---------------------二开部分Begin  额度限制，API调用计费 ---------------------
                 if kwargs.get("end_user"):
                     create_or_update_end_user_account_join_extend(
-                        kwargs["end_user"].id, tenantAccountJoin.account_id, app_model.id
+                        kwargs["end_user"].id, tenant_account_join.account_id, app_model.id
                     )
                 # ---------------------二开部分End  额度限制，API调用计费 ---------------------
 

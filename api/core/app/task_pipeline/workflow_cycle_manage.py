@@ -44,6 +44,7 @@ from core.app.entities.task_entities import (
     WorkflowFinishStreamResponse,
     WorkflowStartStreamResponse,
 )
+from core.app.task_pipeline.exc import WorkflowRunNotFoundError
 from core.file import FILE_MODEL_IDENTITY, File
 from core.model_runtime.utils.encoders import jsonable_encoder
 from core.ops.entities.trace_entity import TraceTaskName
@@ -68,8 +69,6 @@ from models.workflow import (
 from tasks.extend.update_account_money_when_workflow_node_execution_created_extend import (
     update_account_money_when_workflow_node_execution_created_extend,  # 二开部分End - 密钥额度限制
 )
-
-from .exc import WorkflowRunNotFoundError
 
 
 class WorkflowCycleManage:
@@ -157,7 +156,7 @@ class WorkflowCycleManage:
     ) -> WorkflowRun:
         """
         Workflow run success
-        :param workflow_run: workflow run
+        :param workflow_run_id: workflow run id
         :param start_at: start time
         :param total_tokens: total tokens
         :param total_steps: total steps
@@ -169,7 +168,7 @@ class WorkflowCycleManage:
 
         outputs = WorkflowEntry.handle_special_values(outputs)
 
-        workflow_run.status = WorkflowRunStatus.SUCCEEDED.value
+        workflow_run.status = WorkflowRunStatus.SUCCEEDED
         workflow_run.outputs = json.dumps(outputs or {})
         workflow_run.elapsed_time = time.perf_counter() - start_at
         workflow_run.total_tokens = total_tokens
@@ -204,7 +203,7 @@ class WorkflowCycleManage:
         workflow_run = self._get_workflow_run(session=session, workflow_run_id=workflow_run_id)
         outputs = WorkflowEntry.handle_special_values(dict(outputs) if outputs else None)
 
-        workflow_run.status = WorkflowRunStatus.PARTIAL_SUCCESSED.value
+        workflow_run.status = WorkflowRunStatus.PARTIAL_SUCCEEDED.value
         workflow_run.outputs = json.dumps(outputs or {})
         workflow_run.elapsed_time = time.perf_counter() - start_at
         workflow_run.total_tokens = total_tokens
@@ -240,7 +239,7 @@ class WorkflowCycleManage:
     ) -> WorkflowRun:
         """
         Workflow run failed
-        :param workflow_run: workflow run
+        :param workflow_run_id: workflow run id
         :param start_at: start time
         :param total_tokens: total tokens
         :param total_steps: total steps

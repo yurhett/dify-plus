@@ -61,6 +61,7 @@ class CodeExecutor:
         Execute code
         :param purview: bool # Extend global code
         :param language: code language
+        :param preload: the preload script
         :param code: code
         :return:
         """

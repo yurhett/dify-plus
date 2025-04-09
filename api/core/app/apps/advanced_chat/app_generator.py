@@ -91,7 +91,7 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
         :param user: account or end user
         :param args: request args
         :param invoke_from: invoke from source
-        :param stream: is stream
+        :param streaming: is stream
         """
         if not args.get("query"):
             raise ValueError("query is required")
@@ -191,10 +191,10 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
 
         :param app_model: App
         :param workflow: Workflow
+        :param node_id: the node id
         :param user: account or end user
         :param args: request args
-        :param invoke_from: invoke from source
-        :param stream: is stream
+        :param streaming: is streamed
         """
         if not node_id:
             raise ValueError("node_id is required")
@@ -248,10 +248,10 @@ class AdvancedChatAppGenerator(MessageBasedAppGenerator):
 
         :param app_model: App
         :param workflow: Workflow
+        :param node_id: the node id
         :param user: account or end user
         :param args: request args
-        :param invoke_from: invoke from source
-        :param stream: is stream
+        :param streaming: is stream
         """
         if not node_id:
             raise ValueError("node_id is required")

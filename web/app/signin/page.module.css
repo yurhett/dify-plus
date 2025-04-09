@@ -15,8 +15,3 @@
 .oauth2Icon {
     background: center/contain url('./assets/oauth2.svg');
 }
-
-.background {
-    background-image: url('./assets/background.png');
-    background-size: cover;
-}

@@ -23,7 +23,9 @@ def upgrade():
     sa.Column('id', models.types.StringUUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
     sa.Column('account_id', models.types.StringUUID(), nullable=False),
     sa.Column('forwarding_id', models.types.StringUUID(), nullable=False),
-    sa.Column('money', sa.Numeric(precision=10, scale=7), nullable=True),
+    sa.Column('money', sa.Numeric(precision=16, scale=7), nullable=True),
+    sa.Column('info', sa.JSON(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP(0)'), nullable=False),
     sa.PrimaryKeyConstraint('id', name='account_layover_record_extend_pkey')
     )
     with op.batch_alter_table('account_layover_record_extend', schema=None) as batch_op:

@@ -27,11 +27,13 @@ def upgrade():
     sa.Column('description', sa.Text(), server_default=sa.text("''::character varying"), nullable=False),
     sa.Column('content_type', sa.Integer(), server_default=sa.text('0'), nullable=False),
     sa.Column('billing', sa.Text(), server_default=sa.text("'[]'"), nullable=False),
+    sa.Column('status', sa.Boolean(), server_default=sa.text('true'), nullable=True),
     sa.PrimaryKeyConstraint('id', name='forwarding_address_pkey')
     )
     with op.batch_alter_table('forwarding_address_extend', schema=None) as batch_op:
         batch_op.create_index('idx_forwarding_address_id', ['forwarding_id'], unique=False)
         batch_op.create_index('idx_forwarding_address_path', ['path'], unique=False)
+        batch_op.create_index('idx_forwarding_address_status', ['status'], unique=False)
 
     op.create_table('forwarding_extend',
     sa.Column('id', models.types.StringUUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
@@ -56,6 +58,7 @@ def downgrade():
     with op.batch_alter_table('forwarding_address_extend', schema=None) as batch_op:
         batch_op.drop_index('idx_forwarding_address_path')
         batch_op.drop_index('idx_forwarding_address_id')
+        batch_op.drop_index('idx_forwarding_address_status')
 
     op.drop_table('forwarding_address_extend')
     # ### end Alembic commands ###

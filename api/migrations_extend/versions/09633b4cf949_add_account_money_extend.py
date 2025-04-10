@@ -22,8 +22,8 @@ def upgrade():
     op.create_table('account_money_extend',
                     sa.Column('id', models.types.StringUUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
                     sa.Column('account_id', models.types.StringUUID(), nullable=False),
-                    sa.Column('total_quota', sa.Numeric(precision=10, scale=7), nullable=True),
-                    sa.Column('used_quota', sa.Numeric(precision=10, scale=7), nullable=True),
+                    sa.Column('total_quota', sa.Numeric(precision=16, scale=7), nullable=True),
+                    sa.Column('used_quota', sa.Numeric(precision=16, scale=7), nullable=True),
                     sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP(0)'), nullable=False),
                     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP(0)'), nullable=False),
                     sa.PrimaryKeyConstraint('id', name='account_money_pkey')

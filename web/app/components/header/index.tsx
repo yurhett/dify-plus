@@ -70,10 +70,10 @@ const Header = () => {
                 <WorkplaceSelector />
               </WorkspaceProvider>
               {enableBilling ? <PlanBadge allowHover sandboxAsUpgrade plan={plan.type} onClick={handlePlanClick} /> : <LicenseNav />}
-              <AccountMoneyExtend />{/*  // 二开部分 - 额度限制 */}
             </div>
           </div>
         }
+        {!isMobile && <AccountMoneyExtend />}{/*  // 二开部分 - 额度限制 */}
       </div >
       {isMobile && (
         <div className='flex'>

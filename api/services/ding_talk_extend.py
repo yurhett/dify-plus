@@ -106,7 +106,7 @@ class DingTalkService:
             return "", "Request for user information failed: " + userid + " " + json.dumps(reqs)
         # Check if the user exists
         username = reqs["result"]['name']
-        email = f"{"".join(lazy_pinyin(username))}@{dify_config.EMAIL_DOMAIN}"
+        email = f"{''.join(lazy_pinyin(username))}@{dify_config.EMAIL_DOMAIN}"
         if "email" in reqs["result"] and len(reqs["result"]["email"]):
             email = reqs["result"]["email"]
         account: Account = (
@@ -168,7 +168,7 @@ class DingTalkService:
         # Print the response content
         unionIdReq = unionIdResponse.json()
         if unionIdReq["errcode"] != 0:
-            return "", f"Request failed,  msg: {unionIdReq["errmsg"]}"
+            return "", f"Request failed,  msg: {unionIdReq['errmsg']}"
 
         token, err = cls.auto_create_user(unionIdReq["result"]["userid"])
         if len(err) > 0:

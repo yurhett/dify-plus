@@ -61,7 +61,7 @@ class PassportResourceExtend(Resource):
             print("app_model", app_model, flush=True)
             raise NotFound()
 
-        endUser_ta = EndUser.query.filter_by(id=user_id).first()
+        endUser_ta = db.session.query(EndUser).filter(EndUser.id == user_id).first()
         if not endUser_ta:
             end_user = EndUser(
                 id=user_id,

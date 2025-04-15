@@ -52,21 +52,32 @@ const NormalForm = () => {
     if (typeof window === 'undefined' || !dd)
       return
 
-    const consoleToken = decodeURIComponent(searchParams.get('console_token') || '')
+    let consoleToken: string | null | undefined = decodeURIComponent(searchParams.get('console_token') || '')
     const consoleTokenFromLocalStorage = localStorage?.getItem('console_token')
+    const jumpsNumber = Number(localStorage?.getItem('jumps_number'))
     if (consoleToken || consoleTokenFromLocalStorage) {
+      if (!consoleToken)
+        consoleToken = consoleTokenFromLocalStorage
       if (consoleToken) {
+        if (jumpsNumber) {
+          // token无效
+          localStorage.removeItem('console_token')
+          window.location.href = '/explore/apps-center-extend'
+          return
+        }
         localStorage.setItem('console_token', consoleToken)
+        localStorage?.setItem('jumps_number', (jumpsNumber + 1).toString())
         window.location.href = `/explore/apps-center-extend?console_token=${consoleToken}`
+        return
       }
       else {
         window.location.href = '/explore/apps-center-extend'
+        return
       }
     }
     const userAgent = navigator.userAgent.toLowerCase()
     const host = process.env.NEXT_PUBLIC_API_PREFIX
     const corpId = allFeatures.ding_talk_corp_id
-    const agentId = allFeatures.ding_talk
     if (userAgent.includes('dingtalk') && corpId && host) {
       // Extend Start DingTalk login compatible
       localStorage?.removeItem('redirect_url')

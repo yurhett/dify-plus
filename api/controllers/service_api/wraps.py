@@ -97,7 +97,7 @@ def validate_app_token(view: Optional[Callable] = None, *, fetch_user_arg: Optio
             # TODO 需要写入缓存，读缓存
             account_money = (
                 db.session.query(AccountMoneyExtend)
-                .filter(AccountMoneyExtend.account_id == tenant_account_join.account_id)
+                .filter(AccountMoneyExtend.account_id == ta.account_id)
                 .first()
             )
             if account_money and account_money.used_quota >= account_money.total_quota:
@@ -147,7 +147,7 @@ def validate_app_token(view: Optional[Callable] = None, *, fetch_user_arg: Optio
                 # ---------------------二开部分Begin  额度限制，API调用计费 ---------------------
                 if kwargs.get("end_user"):
                     create_or_update_end_user_account_join_extend(
-                        kwargs["end_user"].id, tenant_account_join.account_id, app_model.id
+                        kwargs["end_user"].id, ta.account_id, app_model.id
                     )
                 # ---------------------二开部分End  额度限制，API调用计费 ---------------------
 

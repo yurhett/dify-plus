@@ -128,16 +128,26 @@ Dify-Plus，该名字不是说比 Dify 项目牛的意思，意思是想说比 D
 - toxingwang@gmail.com
 - 906631095@qq.com
 
-### 微信交流群
-1. 防止广告进群，添加微信，输入以下代码执行结果
+### 微信交流
+1. 微信交流群
+   - Dify-plus官方交流群1（已满）
+   - Dify-plus官方交流群2（已满）
+   - Dify-plus官方交流群3
+     
+     <img width="200" alt="image" src="https://github.com/user-attachments/assets/228f948c-ed4b-40dd-9ca9-0997a97b98e6" />
+
+2. 防止广告进群，添加微信，输入以下代码执行结果
 ```python
 encoded_str = "5Yqg5YWlZGlmeS1wbHVz5Lqk5rWB576kMgo="
 decoded_bytes = base64.b64decode(encoded_str)
 decoded_str = decoded_bytes.decode('utf-8')
 print(decoded_str)
 ```
-2. 微信二维码：
+
+3. 微信二维码：
 <img width="200" alt="image" src="https://github.com/user-attachments/assets/b5aa106e-4bd9-40d7-925f-05c3f5265ef6" />
+
+备注：微信交流群若加不进去，可添加我们微信，我们拉你进群
 
 ### 请作者喝咖啡~
 <img width="200" alt="image" src="https://github.com/user-attachments/assets/9a1ce3d4-3101-46eb-8a72-0a39db5b836b" />

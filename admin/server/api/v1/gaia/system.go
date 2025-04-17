@@ -1,6 +1,8 @@
 package gaia
 
 import (
+	"context"
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	"github.com/gin-gonic/gin"
@@ -18,8 +20,12 @@ type SystemApi struct{}
 // @Success 200 {object} response.Response{data=gaia.Tenants,msg=string} "查询成功"
 // @Router /gaia/system/dingtalk [get]
 func (systemApi *SystemApi) GetDingTalk(c *gin.Context) {
+	var host string
 	var config = make(map[string]interface{})
-	config["host"] = c.Request.Header.Get("Referer")
+	if host, _ = global.GVA_Dify_REDIS.Get(context.Background(), "api_host").Result(); len(host) == 0 {
+		host = global.GVA_CONFIG.Gaia.Url
+	}
+	config["host"] = host
 	config["config"] = systemIntegratedService.GetIntegratedConfig(gaia.SystemIntegrationDingTalk)
 	response.OkWithData(config, c)
 }

@@ -2,9 +2,11 @@ import json
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
-
+import re # extend: oauth2
 from configs import dify_config
 from extensions.ext_database import db
+from flask import request # extend: oauth2
+from extensions.ext_redis import redis_client # extend: oauth2
 from services.billing_service import BillingService
 from services.enterprise.enterprise_service import EnterpriseService
 from models.system_extend import SystemIntegrationExtend, SystemIntegrationClassify # Extend DingTalk third-party login
@@ -115,6 +117,13 @@ class FeatureService:
     @classmethod
     def get_system_features(cls) -> SystemFeatureModel:
         system_features = SystemFeatureModel()
+        # extend start: oauth2
+        api_host = request.host_url
+        # 通过nginx代理转发会导致 request.host_url 获取的是内网ip，这个时候使用.env的配置
+        if bool(re.search(r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}', request.host_url)):
+            api_host = dify_config.CONSOLE_WEB_URL
+        redis_client.set("api_host", api_host)
+        # extend stop: oauth2
 
         cls._fulfill_system_params_from_env(system_features)
 

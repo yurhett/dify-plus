@@ -1,6 +1,7 @@
 package gaia
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -32,7 +33,11 @@ func (s *SystemOAuth2Api) GetOAuth2Config(c *gin.Context) {
 	configMap.Status = integrated.Status
 	configMap.Classify = integrated.Classify
 	configMap.AppSecret = integrated.AppSecret
-	config["host"] = c.Request.Header.Get("Referer")
+	var host string
+	if host, _ = global.GVA_Dify_REDIS.Get(context.Background(), "api_host").Result(); len(host) == 0 {
+		host = global.GVA_CONFIG.Gaia.Url
+	}
+	config["host"] = host
 	config["config"] = configMap
 	response.OkWithData(config, c)
 }

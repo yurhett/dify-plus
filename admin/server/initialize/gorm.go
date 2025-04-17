@@ -1,11 +1,12 @@
 package initialize
 
 import (
+	"os"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
-	"os"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"

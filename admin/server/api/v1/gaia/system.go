@@ -1,7 +1,6 @@
 package gaia
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	"github.com/gin-gonic/gin"
@@ -20,7 +19,7 @@ type SystemApi struct{}
 // @Router /gaia/system/dingtalk [get]
 func (systemApi *SystemApi) GetDingTalk(c *gin.Context) {
 	var config = make(map[string]interface{})
-	config["host"] = global.GVA_CONFIG.Gaia.Url
+	config["host"] = c.Request.Header.Get("Referer")
 	config["config"] = systemIntegratedService.GetIntegratedConfig(gaia.SystemIntegrationDingTalk)
 	response.OkWithData(config, c)
 }
@@ -43,7 +42,8 @@ func (systemApi *SystemApi) SetDingTalk(c *gin.Context) {
 	}
 	// update
 	req.Classify = gaia.SystemIntegrationDingTalk
-	if err = systemIntegratedService.SetIntegratedConfig(req, req.Test); err != nil {
+	if err = systemIntegratedService.SetIntegratedConfig(
+		req, "", req.Test); err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}

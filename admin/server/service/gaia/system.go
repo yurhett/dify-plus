@@ -1,17 +1,22 @@
 package gaia
 
 import (
+	"encoding/json"
 	"errors"
-	"net/http"
-	"net/url"
-	"os"
-
+	"fmt"
 	"github.com/faabiosr/cachego/file"
 	"github.com/fastwego/dingding"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 )
 
 type SystemIntegratedService struct{}
@@ -48,7 +53,10 @@ func (e *SystemIntegratedService) GetIntegratedConfig(classID uint) (integrate g
 // @Security ApiKeyAuth
 // @accept application/json
 // @Produce application/json
-func (e *SystemIntegratedService) SetIntegratedConfig(integrate gaia.SystemIntegration, test bool) (err error) {
+// @param: integrate gaia.SystemIntegration, code string, test bool
+// @return: err error
+func (e *SystemIntegratedService) SetIntegratedConfig(
+	integrate gaia.SystemIntegration, code string, test bool) (err error) {
 	// classID是否在
 	var log gaia.SystemIntegration
 	if err = global.GVA_DB.Where("classify = ?", integrate.Classify).First(&log).Error; err != nil {
@@ -74,7 +82,6 @@ func (e *SystemIntegratedService) SetIntegratedConfig(integrate gaia.SystemInteg
 		}
 	}
 	// CorpID
-	var ding *dingding.Client
 	if utils.AddAsteriskToString(log.CorpID) != integrate.CorpID {
 		log.CorpID = integrate.CorpID
 	}
@@ -82,12 +89,9 @@ func (e *SystemIntegratedService) SetIntegratedConfig(integrate gaia.SystemInteg
 	log.AppID = integrate.AppID
 	// 关闭不需要请求
 	if integrate.Status || test {
-		if ding, err = e.DingTalkConfigAvailable(integrate); err != nil {
-			return errors.New("钉钉链接失败" + err.Error())
-		}
-		// token
-		if _, err = ding.AccessTokenManager.GetAccessToken(); err != nil {
-			return errors.New("钉钉token获取失败:" + err.Error())
+		// 测试连接
+		if err = e.TestConnection(integrate, code); err != nil {
+			return errors.New("连接失败:" + err.Error())
 		}
 	}
 	// Test completed
@@ -95,7 +99,9 @@ func (e *SystemIntegratedService) SetIntegratedConfig(integrate gaia.SystemInteg
 		return err
 	}
 	// save
-	if err = global.GVA_DB.Model(&gaia.SystemIntegration{}).Where("id=?", log.Id).Updates(&map[string]interface{}{
+	if err = global.GVA_DB.Model(&gaia.SystemIntegration{}).Where(
+		"id=?", log.Id).Updates(&map[string]interface{}{
+		"config":     integrate.Config,
 		"status":     integrate.Status,
 		"agent_id":   integrate.AgentID,
 		"app_key":    integrate.AppKey,
@@ -133,4 +139,98 @@ func (e *SystemIntegratedService) DingTalkConfigAvailable(req gaia.SystemIntegra
 			return reqs
 		},
 	}), err
+}
+
+// TestConnection 测试连接
+// @Tags System Integrated
+// @Summary 测试系统集成连接
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @param: integrate gaia.SystemIntegration, code string
+// @return: error
+func (e *SystemIntegratedService) TestConnection(integrate gaia.SystemIntegration, code string) error {
+	switch integrate.Classify {
+	case gaia.SystemIntegrationDingTalk:
+		// 测试钉钉连接
+		if _, err := e.DingTalkConfigAvailable(integrate); err != nil {
+			return errors.New("钉钉链接失败: " + err.Error())
+		}
+		return nil
+	case gaia.SystemIntegrationOAuth2:
+		// 测试OAuth2连接
+		return e.TestOAuth2Connection(integrate, code)
+	default:
+		return errors.New("不支持的集成类型")
+	}
+}
+
+// TestOAuth2Connection 测试OAuth2连接
+// @Tags System Integrated
+// @Summary 测试OAuth2连接
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @param: integrate gaia.SystemIntegration, code string
+// @return: error
+func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemIntegration, code string) (err error) {
+	// 解析Config字段
+	var configMap request.SystemOAuth2Request
+	if err = json.Unmarshal([]byte(integrate.Config), &configMap); err != nil {
+		global.GVA_LOG.Error("解析OAuth2配置失败!", zap.Error(err))
+		return err
+	}
+	// 没有code的（保存操作）
+	if len(code) == 0 {
+		return nil
+	}
+	// 检查必要字段
+	if configMap.ServerURL == "" || configMap.TokenURL == "" || integrate.AppID == "" || integrate.AppSecret == "" {
+		return errors.New("请填写完整的 OAuth2 配置信息")
+	}
+
+	// 合成请求byte
+	formData := url.Values{}
+	formData.Set("grant_type", "authorization_code")
+	formData.Set("client_secret", integrate.AppSecret)
+	formData.Set("client_id", integrate.AppID)
+	formData.Set("redirect_uri", "")
+	formData.Set("code", code)
+
+	// 发送请求
+	var req *http.Request
+	client := &http.Client{}
+	req, err = http.NewRequest("POST", fmt.Sprintf(
+		"%s%s", configMap.ServerURL, configMap.TokenURL), strings.NewReader(formData.Encode()))
+	if err != nil {
+		global.GVA_LOG.Error("创建测试请求失败", zap.Error(err))
+		return errors.New(fmt.Sprintf("创建测试请求失败: %s", err.Error()))
+	}
+
+	// 设置Content-Type
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	// 发送请求
+	resp, err := client.Do(req)
+	if err != nil {
+		global.GVA_LOG.Error("测试 OAuth2 连接失败", zap.Error(err))
+		return errors.New(fmt.Sprintf("连接 OAuth2 服务器失败: %s", err.Error()))
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		global.GVA_LOG.Error("测试 OAuth2 连接失败", zap.Int("status", resp.StatusCode))
+		return errors.New(fmt.Sprintf("OAuth2 服务器返回错误状态码: %d", resp.StatusCode))
+	}
+	var bodyByte []byte
+	if bodyByte, err = io.ReadAll(resp.Body); err != nil {
+		return fmt.Errorf("OAuth2 request io.ReadAll: %s", resp.Status)
+	}
+
+	var tokenMap request.SystemOAuth2Error
+	if err = json.Unmarshal(bodyByte, &tokenMap); err == nil && tokenMap.Code != 0 {
+		return fmt.Errorf("OAuth2 Eroor: %s", tokenMap.Info)
+	}
+
+	return nil
 }

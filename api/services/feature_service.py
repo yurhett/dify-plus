@@ -1,3 +1,4 @@
+import json
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
@@ -83,6 +84,7 @@ class SystemFeatureModel(BaseModel):
     is_email_setup: bool = False
     license: LicenseModel = LicenseModel()
     is_custom_auth2: str = ""  # extend: Customizing AUTH2
+    is_custom_auth2_logout: str = ""  # extend: Customizing AUTH2
     ding_talk_client_id: str = "" # extend: DingTalk third-party login
     ding_talk_corp_id: str = "" # extend: DingTalk sidebar login
     ding_talk: bool = "" # extend: DingTalk sidebar login
@@ -134,15 +136,20 @@ class FeatureService:
         system_features.is_allow_register = dify_config.ALLOW_REGISTER
         system_features.is_allow_create_workspace = dify_config.ALLOW_CREATE_WORKSPACE
         system_features.is_email_setup = dify_config.MAIL_TYPE is not None and dify_config.MAIL_TYPE != ""
-        # extend start: Customizing AUTH2
-        system_features.is_custom_auth2 = dify_config.OAUTH2_CLIENT_URL
-        # extend stop: Customizing AUTH2
         # extend start: DingTalk third-party login
         for i in db.session.query(SystemIntegrationExtend).filter(SystemIntegrationExtend.status == True).all():
             if i.classify == SystemIntegrationClassify.SYSTEM_INTEGRATION_DINGTALK:
                 system_features.ding_talk_client_id = i.app_key
                 system_features.ding_talk_corp_id = i.corp_id
                 system_features.ding_talk = i.status
+                # Extend: OAuth2 Start
+            elif i.classify == SystemIntegrationClassify.SYSTEM_INTEGRATION_OAUTH_TWO:
+                config = json.loads(i.config)
+                system_features.is_custom_auth2 = i.status
+                if "logout_url" in config.keys():
+                    system_features.is_custom_auth2_logout = "{}{}".format(
+                        config['server_url'], config['logout_url'])
+                # Extend: OAuth2 Stop
         # extend stop: DingTalk third-party login
 
     @classmethod

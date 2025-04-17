@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
@@ -156,3 +158,29 @@ func (b *BaseApi) OaLogin(c *gin.Context) {
 	return
 
 }
+
+// Extend Start: oAuth2 callback verification
+
+// OAuth2Callback
+// @Tags     Base
+// @Summary  oAuth2回调校验
+// @Produce   application/json
+// @Param    code  query    string  true  "授权码"
+// @Success  200   {string} string  "返回HTML内容，包含授权码"
+// @Router   /base/auth2/callback [get]
+func (b *BaseApi) OAuth2Callback(c *gin.Context) {
+	// 获取授权码
+	code := c.Request.URL.Query().Get("code")
+	if code == "" {
+		global.GVA_LOG.Error("OAuth2回调未获取到授权码")
+		c.String(http.StatusBadRequest, "授权码不能为空")
+		return
+	}
+
+	// 返回HTML内容，通过BroadcastChannel将授权码传递给前端
+	htmlContent := fmt.Sprintf(`<html><body><script>const channel = new BroadcastChannel('oAuth2');channel.postMessage({code: '%s', timestamp: Date.now() });channel.close();window.close();</script></body></html>`, code)
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(http.StatusOK, htmlContent)
+}
+
+// Extend Stop: oAuth2 callback verification

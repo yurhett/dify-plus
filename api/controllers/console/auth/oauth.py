@@ -45,16 +45,9 @@ def get_oauth_providers():
                 redirect_uri=dify_config.CONSOLE_API_URL + "/console/api/oauth/authorize/google",
             )
 
-        if not dify_config.OAUTH2_CLIENT_ID or not dify_config.OAUTH2_CLIENT_SECRET:
-            oa_oauth = None
-        else:
-            oa_oauth = OaOAuth(
-                client_id=dify_config.OAUTH2_CLIENT_ID,
-                client_secret=dify_config.OAUTH2_CLIENT_SECRET,
-                redirect_uri=dify_config.CONSOLE_API_URL + "/console/api/oauth/authorize/oauth2",
-            )
+        oauth2 = OaOAuth(client_id='', client_secret='', redirect_uri='') # Extend: oauth2
 
-        OAUTH_PROVIDERS = {"github": github_oauth, "google": google_oauth, "oauth2": oa_oauth}
+        OAUTH_PROVIDERS = {"github": github_oauth, "google": google_oauth, "oauth2": oauth2}
         return OAUTH_PROVIDERS
 
 

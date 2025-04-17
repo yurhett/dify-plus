@@ -202,6 +202,11 @@ func (i *initApi) InitializeData(ctx context.Context) (context.Context, error) {
 		{ApiGroup: "应用集成配置", Method: "GET", Path: "/gaia/system/dingtalk", Description: "获取钉钉系统配置"},
 		{ApiGroup: "应用集成配置", Method: "POST", Path: "/gaia/system/dingtalk", Description: "设置钉钉系统配置"},
 		// Extend Stop: system integration
+
+		// Extend Start: oauth2
+		{ApiGroup: "应用集成配置", Method: "GET", Path: "/gaia/system/oauth2", Description: "设置OAuth2配置"},
+		{ApiGroup: "应用集成配置", Method: "POST", Path: "/gaia/system/oauth2", Description: "获取OAuth2集成配置"},
+		// Extend Stop: oauth2
 	}
 	if err := db.Create(&entities).Error; err != nil {
 		return ctx, errors.Wrap(err, sysModel.SysApi{}.TableName()+"表数据初始化失败!")

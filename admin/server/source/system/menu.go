@@ -92,6 +92,11 @@ func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, er
 		// Extend Start: system integration
 		{MenuLevel: 0, Hidden: false, ParentId: 0, Path: "SystemIntegrated", Name: "SystemIntegrated", Component: "view/systemIntegrated/index.vue", Sort: 1, Meta: Meta{Title: "系统集成", Icon: "box"}},
 		{MenuLevel: 0, Hidden: false, ParentId: 38, Path: "IntegratedDingTalk", Name: "IntegratedDingTalk", Component: "view/systemIntegrated/dingTalk/index.vue", Sort: 1, Meta: Meta{Title: "钉钉", Icon: "turn-off"}},
+		{MenuLevel: 0, Hidden: false, ParentId: 38, Path: "IntegratedOAuth2", Name: "IntegratedOAuth2", Component: "view/systemIntegrated/oauth2/index.vue", Sort: 2, Meta: Meta{Title: "OAuth2", Icon: "connection"}},
+		// Extend Stop: system integration
+
+		// Extend Start: system integration
+		{MenuLevel: 0, Hidden: false, ParentId: 46, Path: "integratedOAuth2", Name: "integratedOAuth2", Component: "view/systemIntegrated/oauth2/index.vue", Sort: 2, Meta: Meta{Title: "OAuth2", Icon: "share"}},
 		// Extend Stop: system integration
 
 		// 二开部分

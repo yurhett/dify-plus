@@ -8,6 +8,7 @@ type ApiGroup struct {
 	TenantsApi
 	SystemApi
 	TestApi
+	SystemOAuth2Api
 }
 
 var (

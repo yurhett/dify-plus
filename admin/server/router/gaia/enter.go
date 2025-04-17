@@ -14,6 +14,7 @@ var (
 	dashboardApi = api.ApiGroupApp.GaiaApiGroup.DashboardApi
 	tenantsApi   = api.ApiGroupApp.GaiaApiGroup.TenantsApi
 )
+var systemOAuth2Api = api.ApiGroupApp.GaiaApiGroup.SystemOAuth2Api
 var systemApi = api.ApiGroupApp.GaiaApiGroup.SystemApi
 var quotaApi = api.ApiGroupApp.GaiaApiGroup.QuotaApi
 var testApi = api.ApiGroupApp.GaiaApiGroup.TestApi

@@ -37,6 +37,12 @@ export type UserProfileResponse = {
   // ----------------------- 二开部分Stop 添加用户权限 - --------------------------------
 }
 
+// ----------------------- 二开部分Start oauth2 - --------------------------------
+export type OAuth2 = {
+  logout_url: string
+}
+// ----------------------- 二开部分Start oauth2 - --------------------------------
+
 export type UserProfileOriginResponse = {
   json: () => Promise<UserProfileResponse>
   bodyUsed: boolean

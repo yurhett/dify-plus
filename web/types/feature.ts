@@ -33,6 +33,7 @@ export type SystemFeatures = {
   is_email_setup: boolean
   license: License
   is_custom_auth2: string // extend: Customizing AUTH2
+  is_custom_auth2_logout: string // extend: AUTH2 logout url
   ding_talk_client_id: string // Extend: DingTalk third-party login
   ding_talk_corp_id: string // Extend: DingTalk sidebar login
   ding_talk: boolean // Extend: switch DingTalk sidebar login

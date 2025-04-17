@@ -8,6 +8,7 @@ class SystemIntegrationClassify:
     SYSTEM_INTEGRATION_DINGTALK = 1 # 钉钉
     SYSTEM_INTEGRATION_WEIXIN = 2 # 微信
     SYSTEM_INTEGRATION_FEI_SU = 3 # 飞书
+    SYSTEM_INTEGRATION_OAUTH_TWO = 4 # OAuth2
 
 
 class SystemIntegrationExtend(db.Model):
@@ -21,8 +22,10 @@ class SystemIntegrationExtend(db.Model):
     status = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     corp_id = db.Column(db.String(120), nullable=True)
     agent_id = db.Column(db.String(120), nullable=True)
+    app_id = db.Column(db.String(120), nullable=True)
     app_key = db.Column(db.String(120), nullable=True)
     app_secret = db.Column(db.Text, nullable=True)
+    config = db.Column(db.Text, nullable=True)
 
     def decodeSecret(self):
         if len(self.app_secret) == 0:

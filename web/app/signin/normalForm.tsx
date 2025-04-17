@@ -15,6 +15,7 @@ import Toast from '@/app/components/base/toast'
 import { IS_CE_EDITION } from '@/config'
 // extend : support ding_talk login
 import DingTalkAuth from '@/app/signin/components/dingtalk-auth'
+import OAuth2 from '@/app/signin/components/oauth2' // extend: add oauth2
 
 // 声明一个变量来存储钉钉SDK
 let dd: any = null
@@ -231,8 +232,12 @@ const NormalForm = () => {
             {systemFeatures.sso_enforced_for_signin && <div className='w-full'>
               <SSOAuth protocol={systemFeatures.sso_enforced_for_signin_protocol} />
             </div>}
-            {/* extend : support ding_talk login */}
-            {systemFeatures.ding_talk && (<DingTalkAuth clientId={systemFeatures.ding_talk_client_id}></DingTalkAuth>)} { /* Extend: add DingTalk Auth */ }
+            {/* Extend start: ding_talk login */}
+            {systemFeatures.ding_talk && (<DingTalkAuth clientId={systemFeatures.ding_talk_client_id}></DingTalkAuth>)}
+            { /* Extend stop: DingTalk login */ }
+            {/* Extend start: oauth2 login */}
+            {systemFeatures.is_custom_auth2 && (<OAuth2></OAuth2>)}
+            { /* Extend stop: oauth2 login */ }
           </div>
 
           {showORLine && <div className="relative mt-6">

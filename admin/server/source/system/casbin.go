@@ -288,6 +288,11 @@ func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error
 		{Ptype: "p", V0: "888", V1: "/gaia/system/dingtalk", V2: "GET"},
 		{Ptype: "p", V0: "888", V1: "/gaia/system/dingtalk", V2: "POST"},
 		// Extend Stop: system integration
+
+		// Extend Start: oauth2
+		{Ptype: "p", V0: "888", V1: "/gaia/system/oauth2", V2: "GET"},
+		{Ptype: "p", V0: "888", V1: "/gaia/system/oauth2", V2: "POST"},
+		// Extend Stop: oauth2
 	}
 	if err := db.Create(&entities).Error; err != nil {
 		return ctx, errors.Wrap(err, "Casbin 表 ("+i.InitializerName()+") 数据初始化失败!")

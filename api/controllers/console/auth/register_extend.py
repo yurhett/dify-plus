@@ -35,12 +35,12 @@ class AdminRegisterApi(Resource):
         # 解析jwt
         if not ("AuthorityId" in decoded_jwt.keys() and int(
                 decoded_jwt["AuthorityId"]) == int(dify_config.ADMIN_GROUP_ID)):
-            return {"error": "User already exists."}, 351
+            return {"error": "Unable to add a new backend super admin groups."}, 351
         try:
-            if Account.query.filter_by(email=args.email).first() is not None:
-                return {"error": "User already exists."}, 351
+            if db.session.query(Account).filter_by(email=args.email).first() is not None:
+                return {"error": "User already exists"}, 352
         except:
-            return {"error": "User already exists."}, 351
+            return {"error": "Can't find the relevant user email."}, 353
         account = AccountService.create_account(
             password=str(uuid.uuid4()).replace('-', ''),
             interface_language="zh-Hans",

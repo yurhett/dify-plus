@@ -6,15 +6,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"regexp"
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
-	"regexp"
-	"time"
 )
 
 // IsUserPasswordValid
@@ -170,16 +171,15 @@ func RegisterUser(u system.SysUser, token string) (err error) {
 		return err
 	}
 
-	global.GVA_LOG.Debug("注册用户信息:", zap.Any("1", 1))
 	_ = res.Body.Close()
 	if err = json.Unmarshal(bodyByte, &bodyMap); err != nil {
+		global.GVA_LOG.Debug("json unmarshal error:", zap.Any("error", err.Error()))
 		return err
 	}
 
-	global.GVA_LOG.Debug("注册用户信息:", zap.Any("1", 1))
 	// result
 	if result, ok := bodyMap["result"]; !ok && result != "success" {
-		return errors.New("failed to create user")
+		return errors.New(fmt.Sprintf("failed to create user: %s", bodyMap["error"]))
 	}
 	// 修改密码
 	var account gaia.Account
@@ -187,7 +187,6 @@ func RegisterUser(u system.SysUser, token string) (err error) {
 		return err
 	}
 
-	global.GVA_LOG.Debug("注册用户信息:", zap.Any("1", 1))
 	// 修改密码
 	global.GVA_DB.Model(&account).Updates(&map[string]interface{}{
 		"password":      passwordHashed,

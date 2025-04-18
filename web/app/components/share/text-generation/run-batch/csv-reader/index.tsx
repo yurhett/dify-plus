@@ -38,10 +38,24 @@ const CustomCSVReader: React.FC<CCProps> = ({
       // 检测文本编码
       const encodingResult = jschardet.detect(result)
       let encoding = encodingResult.encoding || 'utf-8'
+      // Extend start: 处理可能的误判，将 ISO-8859-2 视为 GBK
+      // 处理可能的误判，将 ISO-8859-2 视为 GBK
+      if (encoding === 'ISO-8859-2') {
+        encoding = 'gbk'
+      }
+      else if (encodingResult.encoding == null) {
+        // 判断是否windows
+        const language = navigator.language || navigator.userLanguage
+        const isWindows = (navigator.platform && navigator.platform.includes('Win')) || navigator.userAgent.includes('Win')
+        const isChineseLanguage = /^zh/i.test(language) || (navigator.languages && navigator.languages.some(lang => /^zh/i.test(lang)))
+        if (isWindows && isChineseLanguage)
+          encoding = 'gbk'
+      }
 
       // 处理可能的误判，将 ISO-8859-2 视为 GBK
-      if (encoding === 'ISO-8859-2')
+      if (encoding === 'ISO-8859-2' || encoding === 'TIS-620' || !encoding.indexOf('windows'))
         encoding = 'gbk'
+      // Extend stop: 处理可能的误判，将 ISO-8859-2 视为 GBK
 
       console.log('encoding: ', encoding)
       // 重新用检测到的编码读取文件内容

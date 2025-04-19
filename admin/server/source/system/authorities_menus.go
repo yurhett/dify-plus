@@ -45,7 +45,10 @@ func (i *initMenuAuthority) InitializeData(ctx context.Context) (next context.Co
 	}
 	next = ctx
 	// 888
-	if err = db.Model(&authorities[0]).Association("SysBaseMenus").Replace(menus[31:39]); err != nil {
+	if err = db.Model(&authorities[0]).Association("SysBaseMenus").Replace(menus[31:34]); err != nil {
+		return next, err
+	}
+	if err = db.Model(&authorities[0]).Association("SysBaseMenus").Append(menus[37:40]); err != nil {
 		return next, err
 	}
 	if err = db.Model(&authorities[0]).Association("SysBaseMenus").Append(menus[2:5]); err != nil {

@@ -458,7 +458,7 @@ x-shared-env: &shared-api-worker-env
 services:
   # API service
   api:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.0.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.0
     restart: always
     environment:
       # Use the shared environment variables.
@@ -486,7 +486,7 @@ services:
   # worker service
   # The Celery worker for processing the queue.
   worker:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.0.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.0
     restart: always
     environment:
       # Use the shared environment variables.
@@ -510,7 +510,7 @@ services:
 
   # Frontend web application.
   web:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-web:1.0.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-web:1.2.0
     restart: always
     environment:
       CONSOLE_API_URL: ${CONSOLE_API_URL:-}
@@ -595,7 +595,7 @@ services:
 
   # plugin daemon
   plugin_daemon:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plugin-daemon:0.0.6-local
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plugin-daemon:0.0.7-local
     restart: always
     environment:
       # Use the shared environment variables.
@@ -1102,7 +1102,7 @@ services:
 
   # Extend - admin-web
   admin-web:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-web:0.0.7
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-web:1.2.0
     restart: always
     ports:
       - '8081:8081'
@@ -1114,7 +1114,7 @@ services:
 
   # Extend - admin-server
   admin-server:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-server:0.0.7
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-server:1.2.0
     restart: always
     ports:
       - '8888:8888'

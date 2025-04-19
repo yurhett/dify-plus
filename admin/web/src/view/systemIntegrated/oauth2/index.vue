@@ -57,7 +57,7 @@
                 配置链接应用信息
               </el-button>
             </div>
-            <div class="bg-gray-50 p-5 border rounded-lg">
+            <div class="bg-gray-50 dark:bg-slate-800 p-5 border dark:border-slate-700 rounded-lg">
               <div class="flex items-center mb-4">
                 <span class="info-label">OAuth2 服务器地址:</span>
                 <el-input v-if="openEdit" v-model="config.server_url" class="info-value flex-1" placeholder="例如: https://oauth2.example.com" />
@@ -327,15 +327,15 @@ onBeforeUnmount(() => {
 
 .info-label {
   width: 180px;
-  @apply text-gray-600;
+  @apply text-gray-600 dark:text-gray-400;
 }
 
 .info-value {
-  @apply font-medium;
+  @apply font-medium dark:text-gray-200;
 }
 
 .tips-content {
-  @apply text-gray-600;
+  @apply text-gray-600 dark:text-gray-400;
 }
 
 .tip-item {

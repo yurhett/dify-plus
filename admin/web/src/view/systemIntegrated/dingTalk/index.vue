@@ -57,7 +57,7 @@
                 配置链接应用信息
               </el-button>
             </div>
-            <div class="bg-gray-50 p-5 border rounded-lg">
+            <div class="bg-gray-50 dark:bg-slate-800 p-5 border dark:border-slate-700 rounded-lg">
               <div class="flex items-center mb-4">
                 <span class="info-label">CorpID:</span>
                 <el-input v-if="openEdit" v-model="config.corp_id" class="info-value flex-1" />
@@ -251,7 +251,7 @@ const goToSecuritySettings = () => {
 }
 
 .card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-100 p-5;
+  @apply bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 p-5;
 }
 
 .card-header {
@@ -267,19 +267,19 @@ const goToSecuritySettings = () => {
 }
 
 .info-label {
-  @apply text-gray-600 w-28;
+  @apply text-gray-600 dark:text-gray-400 w-28;
 }
 
 .info-value {
-  @apply font-mono text-gray-800;
+  @apply font-mono text-gray-800 dark:text-gray-200;
 }
 
 .tips-content {
-  @apply bg-amber-50 p-4 rounded-lg;
+  @apply bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg;
 }
 
 .tip-item {
-  @apply mb-2 text-gray-700;
+  @apply mb-2 text-gray-700 dark:text-gray-300;
 }
 
 .config-btn {

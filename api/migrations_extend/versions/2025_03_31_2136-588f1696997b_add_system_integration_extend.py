@@ -27,15 +27,12 @@ def upgrade():
     if 'system_integration_extend' not in tables:
         op.create_table('system_integration_extend',
         sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
-        sa.Column('classify', sa.Integer(), server_default=sa.text('1'), nullable=False, comment='集成类型'),
-        sa.Column('status', sa.Boolean(), server_default=sa.text('false'), nullable=False, comment='配置启用状态'),
-        sa.Column('corp_id', sa.Text(), nullable=True, comment='企业id'),
-        sa.Column('agent_id', sa.Text(), nullable=True, comment='代理Id'),
-        sa.Column('app_key', sa.Text(), nullable=True, comment='加密key'),
-        sa.Column('app_secret', sa.Text(), nullable=True, comment='加密密钥'),
-        sa.Column('test', sa.Boolean(), server_default=sa.text('false'), nullable=True, comment='是否测试链接联通性'),
-        sa.Column('config', sa.Text(), nullable=True, comment='其他配置'),
-        sa.Column('app_id', sa.Text(), nullable=True, comment='应用ID'),
+        sa.Column('classify', sa.Integer(), server_default=sa.text('1'), nullable=False),
+        sa.Column('status', sa.Boolean(), server_default=sa.text('false'), nullable=False),
+        sa.Column('corp_id', sa.String(length=120), nullable=True),
+        sa.Column('agent_id', sa.String(length=120), nullable=True),
+        sa.Column('app_key', sa.String(length=120), nullable=True),
+        sa.Column('app_secret', sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint('id', name='system_integration_joins_pkey')
         )
         with op.batch_alter_table('system_integration_extend', schema=None) as batch_op:

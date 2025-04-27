@@ -1,6 +1,7 @@
 from flask_login import current_user
 from flask_restful import Resource, marshal_with
 
+from configs import dify_config
 from controllers.console import api
 from controllers.console.workspace.workspace import account_initialization_required, setup_required
 from extensions.ext_database import db
@@ -19,7 +20,7 @@ class AccountMoneyApi(Resource):
             db.session.query(AccountMoneyExtend).filter(AccountMoneyExtend.account_id == current_user.id).first()
         )
         if not account_money:
-            return {"total_quota": "15", "used_quota": "0"}, 200
+            return {"total_quota": dify_config.ACCOUNT_TOTAL_QUOTA, "used_quota": "0"}, 200
         return account_money
 
 

@@ -11,6 +11,7 @@ from extensions.ext_database import db
 from libs.login import login_required
 from models import Account
 from models.account import AccountStatus
+from models.account_money_extend import AccountMoneyExtend
 from services.account_service import AccountService, TenantService
 from services.account_service_extend import TenantExtendService
 
@@ -48,6 +49,15 @@ class AdminRegisterApi(Resource):
             name=args.name,
             is_setup=True,
         )
+
+        # extend begin：初始化用户额度数据
+        account_money_add = AccountMoneyExtend(
+            account_id=account.id,
+            used_quota=0,
+            total_quota=dify_config.ACCOUNT_TOTAL_QUOTA,
+        )
+        db.session.add(account_money_add)
+        # extend end：初始化用户额度数据
 
         account.last_login_ip = ""
         account.status = AccountStatus.ACTIVE.value

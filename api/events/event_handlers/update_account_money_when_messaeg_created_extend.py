@@ -40,7 +40,7 @@ def handle(sender, **kwargs):
         account_money_add = AccountMoneyExtend(
             account_id=payerId,
             used_quota=price,
-            total_quota=15,  # TODO 初始总额度这里到时候默认15要改
+            total_quota=dify_config.ACCOUNT_TOTAL_QUOTA,
         )
         db.session.add(account_money_add)
 

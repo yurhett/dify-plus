@@ -47,6 +47,11 @@ class ExtendInfo(BaseSettings):
         default="7.26",
     )
 
+    ACCOUNT_TOTAL_QUOTA: Optional[decimal.Decimal] = Field(
+        description="用户额度初始总额度",
+        default="15",
+    )
+
     DEFAULT_LANGUAGE: Optional[str] = Field(
         description="默认语言",
         default="zh-Hans",

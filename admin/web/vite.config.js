@@ -46,9 +46,14 @@ export default ({
       assetFileNames: 'admin/assets/[name].[hash].[ext]',
     },
   }
+  
+  let base = '/'
+  if (process.env.JS_PATH) {
+    base = process.env.JS_PATH + '/'
+  }
 
   const config = {
-    base: '/', // 编译后js导入的资源路径
+    base: base, // 编译后js导入的资源路径
     root: './', // index.html文件所在位置
     publicDir: 'public', // 静态资源文件夹
     resolve: {

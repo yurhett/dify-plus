@@ -1109,8 +1109,6 @@ services:
     depends_on:
       - admin-server
     command: [ 'nginx-debug', '-g', 'daemon off;' ]
-    environment:
-      JS_PATH: ${JS_PATH:}
     networks:
       - default
 

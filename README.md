@@ -134,7 +134,8 @@ Dify-Plus，该名字不是说比 Dify 项目牛的意思，意思是想说比 D
    - Dify-plus官方交流群2（已满）
    - Dify-plus官方交流群3
 
-     <img width="200" alt="image" src="https://github.com/user-attachments/assets/772d7b1b-0cc1-4d94-b5d1-4cf3c9fce599" />
+     <img width="200" alt="image" src="https://github.com/user-attachments/assets/0a41c454-2a3b-4262-bb6f-ad773a6b5f86" />
+
 
 2. 防止广告进群，添加微信，输入以下代码执行结果
 ```python

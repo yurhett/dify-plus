@@ -9,12 +9,12 @@ import (
 	"io"
 	"net/http"
 	"regexp"
-	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -225,5 +225,5 @@ func SyncExecuteCode() {
 		mailByte = []byte("[]")
 	}
 	// save
-	global.GVA_Dify_REDIS.Set(context.Background(), "control_mail", string(mailByte), time.Hour*168)
+	global.GVA_Dify_REDIS.Set(context.Background(), "control_mail", string(mailByte), redis.KeepTTL)
 }

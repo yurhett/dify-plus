@@ -12,7 +12,7 @@ import cn from '@/utils/classnames'
 import { getSystemFeatures, invitationCheck } from '@/service/common'
 import { LicenseStatus, type SystemFeatures, defaultSystemFeatures } from '@/types/feature' // extend：加上 type SystemFeatures
 import Toast from '@/app/components/base/toast'
-import { IS_CE_EDITION } from '@/config'
+import { IS_CE_EDITION, apiPrefix } from '@/config'
 // extend : support ding_talk login
 import DingTalkAuth from '@/app/signin/components/dingtalk-auth'
 import OAuth2 from '@/app/signin/components/oauth2' // extend: add oauth2
@@ -77,7 +77,7 @@ const NormalForm = () => {
       }
     }
     const userAgent = navigator.userAgent.toLowerCase()
-    const host = process.env.NEXT_PUBLIC_API_PREFIX
+    const host = apiPrefix
     const corpId = allFeatures.ding_talk_corp_id
     if (userAgent.includes('dingtalk') && corpId && host) {
       // Extend Start DingTalk login compatible

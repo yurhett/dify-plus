@@ -17,7 +17,7 @@ import { computed, ref } from 'vue'
 import { useAppStore } from '@/pinia'
 import { storeToRefs } from 'pinia'
 import {getAppTokenDailyQuotaData} from "@/api/gaia/dashboard";
-import {truncateToOneDecimal} from "@/view/gaia/dashboard/components/index";
+import {truncateToTwoDecimal} from "@/view/gaia/dashboard/components/index";
 const appStore = useAppStore()
 const { config } = storeToRefs(appStore)
 defineProps({
@@ -43,8 +43,8 @@ const  graphicFactory = (side) => {
     },
   };
 }
-const xAxis = ref(["2024-1", "2024-2", "2024-3", "2024-4", "2024-5", "2024-6", "2024-7", "2024-8"]);
-const chartsData = ref([12,22,32,45,150,78,89,150]);
+const xAxis = ref(["暂无数据"]);
+const chartsData = ref([0]);
 const graphicElements = ref([
   graphicFactory({ left: '5%' }),
   graphicFactory({ right: 0 }),
@@ -184,7 +184,7 @@ const getTableData = async () => {
   if (code === 0) {
     const formattedData = data.list.map(item => ({
       date: item.stat_date, // 提取年月部分
-      used: truncateToOneDecimal(item.total_used)
+      used: truncateToTwoDecimal(item.total_used)
     }));
 
     // 按日期排序

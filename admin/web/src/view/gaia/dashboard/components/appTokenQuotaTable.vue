@@ -12,7 +12,7 @@
       <el-table-column prop="accumulated_quota" label="已使用($)">
         <template #default="scope">
           <el-tooltip :content="scope.row.accumulated_quota">
-            <span>{{ truncateToOneDecimal(scope.row.accumulated_quota) }}</span>
+            <span>{{ truncateToTwoDecimal(scope.row.accumulated_quota) }}</span>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -21,8 +21,8 @@
         <template #default="scope">
           <el-tooltip :content="`${scope.row.day_used_quota} / ${scope.row.day_limit_quota}`">
             <span :class="getColorClass(scope.row.day_used_quota, scope.row.day_limit_quota)">
-              {{ truncateToOneDecimal(scope.row.day_used_quota) }} /
-              {{ scope.row.day_limit_quota === -1 ? '无限制' : truncateToOneDecimal(scope.row.day_limit_quota) }}
+              {{ truncateToTwoDecimal(scope.row.day_used_quota) }} /
+              {{ scope.row.day_limit_quota === -1 ? '无限制' : truncateToTwoDecimal(scope.row.day_limit_quota) }}
             </span>
           </el-tooltip>
         </template>
@@ -32,8 +32,8 @@
         <template #default="scope">
           <el-tooltip :content="`${scope.row.month_used_quota} / ${scope.row.month_limit_quota}`">
             <span :class="getColorClass(scope.row.month_used_quota, scope.row.month_limit_quota)">
-              {{ truncateToOneDecimal(scope.row.month_used_quota) }} /
-              {{ scope.row.month_limit_quota === -1 ? '无限制' : truncateToOneDecimal(scope.row.month_limit_quota) }}
+              {{ truncateToTwoDecimal(scope.row.month_used_quota) }} /
+              {{ scope.row.month_limit_quota === -1 ? '无限制' : truncateToTwoDecimal(scope.row.month_limit_quota) }}
             </span>
           </el-tooltip>
         </template>
@@ -56,7 +56,7 @@
 <script setup>
 import {ref} from "vue";
 import {getAppTokenQuotaRankingData} from "@/api/gaia/dashboard";
-import {getColorClass, truncateToOneDecimal} from "./index";
+import {getColorClass, truncateToTwoDecimal} from "./index";
 
 const tableData = ref([])
 

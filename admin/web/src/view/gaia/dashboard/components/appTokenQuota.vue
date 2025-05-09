@@ -25,7 +25,7 @@
       <el-table-column prop="total_cost" label="总费用($)" width="120">
         <template #default="scope">
           <el-tooltip :content="scope.row.total_cost">
-            <span>{{ truncateToOneDecimal(scope.row.total_cost) }}</span>
+            <span>{{ truncateToTwoDecimal(scope.row.total_cost) }}</span>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -67,7 +67,7 @@
 <script setup>
 import {ref} from "vue";
 import {getAppQuotaRankingData} from "@/api/gaia/dashboard";
-import {getAppModeColor, getAppModeText, truncateToOneDecimal} from "@/view/gaia/dashboard/components/index";
+import {getAppModeColor, getAppModeText, truncateToTwoDecimal} from "@/view/gaia/dashboard/components/index";
 
 const page = ref(1)
 const total = ref(0)

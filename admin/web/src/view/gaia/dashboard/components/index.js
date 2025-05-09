@@ -12,12 +12,12 @@ export {
     GaiaAppQuotaTable,
 }
 
-// 保留一位小数（不四舍五入）
-export const truncateToOneDecimal = (value) => {
+// 保留两位小数（不四舍五入）
+export const truncateToTwoDecimal = (value) => {
     if (typeof value !== 'number') {
         value = Number(value);
     }
-    return Math.floor(value * 10) / 10;
+    return Math.floor(value * 100) / 100;
 }
 // 根据使用率显示不同颜色
 export const getColorClass = (used, limit) => {

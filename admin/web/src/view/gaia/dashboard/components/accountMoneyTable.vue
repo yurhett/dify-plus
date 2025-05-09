@@ -12,8 +12,8 @@
         <template #default="scope">
           <el-tooltip :content="`${scope.row.used_quota} / ${scope.row.total_quota}`">
             <span :class="getColorClass(scope.row.used_quota, scope.row.total_quota)">
-              {{ truncateToOneDecimal(scope.row.used_quota) }} /
-              {{ scope.row.total_quota === -1 ? '无限制' : truncateToOneDecimal(scope.row.total_quota) }}
+              {{ truncateToTwoDecimal(scope.row.used_quota) }} /
+              {{ scope.row.total_quota === -1 ? '无限制' : truncateToTwoDecimal(scope.row.total_quota) }}
             </span>
           </el-tooltip>
         </template>
@@ -36,7 +36,7 @@
 <script setup>
 import {ref} from "vue";
 import {getAccountQuotaRankingData} from "@/api/gaia/dashboard";
-import {getColorClass, truncateToOneDecimal} from "@/view/gaia/dashboard/components/index";
+import {getColorClass, truncateToTwoDecimal} from "@/view/gaia/dashboard/components/index";
 
 const tableData = ref([])
 

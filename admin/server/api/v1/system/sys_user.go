@@ -1,10 +1,11 @@
 package system
 
 import (
-	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/gaia"
 	"strconv"
 	"time"
+
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/gaia"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
@@ -152,9 +153,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	// Extend: Start admin init
-	r.AuthorityId = system.AdminGroupID
-	// Extend: stop admin init
+
 	var authorities []system.SysAuthority
 	for _, v := range r.AuthorityIds {
 		authorities = append(authorities, system.SysAuthority{

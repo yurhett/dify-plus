@@ -2,12 +2,13 @@ package system
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gofrs/uuid/v5"
-	"strings"
 )
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -75,7 +76,7 @@ func (userService *UserExtendService) SyncUser() {
 	if len(emailList) > 0 {
 		db = db.Where("email NOT IN (?)", emailList)
 	}
-	if err = db.Order("created_at ASC").Find(&accountList).Error; err != nil {
+	if err = db.Where("status = ?", gaia.UserActive).Order("created_at ASC").Find(&accountList).Error; err != nil {
 		global.GVA_LOG.Error("SyncUser gaia表查询失败,原因: " + err.Error())
 		return
 	}

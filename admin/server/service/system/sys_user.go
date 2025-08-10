@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	systemReq "github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	serviceGaia "github.com/flipped-aurora/gin-vue-admin/server/service/gaia"
 	"go.uber.org/zap"
-	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system"
@@ -280,6 +281,25 @@ func (userService *UserService) SetUserAuthorities(adminAuthorityID, id uint, au
 
 func (userService *UserService) DeleteUser(id int) (err error) {
 	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		// 1. 获取用户信息
+		var user system.SysUser
+		if err := tx.Where("id = ?", id).First(&user).Error; err != nil {
+			return err
+		}
+
+		// 2. 关闭关联账户（accounts.status = closed）
+		var account gaia.Account
+		if err := tx.Where("email = ?", user.Email).First(&account).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&gaia.Account{}).Where("id = ?", account.ID).Updates(map[string]interface{}{
+			"status":     gaia.UserClosed,
+			"updated_at": time.Now(),
+		}).Error; err != nil {
+			return err
+		}
+
+		// 3. 删除用户以及用户角色关联
 		if err := tx.Where("id = ?", id).Delete(&system.SysUser{}).Error; err != nil {
 			return err
 		}

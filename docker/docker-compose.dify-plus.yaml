@@ -1109,8 +1109,6 @@ services:
     depends_on:
       - admin-server
     command: [ 'nginx-debug', '-g', 'daemon off;' ]
-    volumes:
-      - ./volumes/admin-server/config.docker.yaml:/app/config.docker.yaml
     networks:
       - default
 
@@ -1131,6 +1129,8 @@ services:
     networks:
       - ssrf_proxy_network
       - default
+    volumes:
+      - ./admin-server/config.docker.yaml:/app/config.docker.yaml
 
   # Extend - sandbox-full
   sandbox-full:

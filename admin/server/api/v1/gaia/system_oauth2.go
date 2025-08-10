@@ -60,14 +60,18 @@ func (s *SystemOAuth2Api) SetOAuth2Config(c *gin.Context) {
 
 	// 序列化为JSON
 	configBytes, err := json.Marshal(&map[string]string{
-		"server_url":       req.ServerURL,
-		"authorize_url":    req.AuthorizeURL,
-		"token_url":        req.TokenURL,
-		"userinfo_url":     req.UserinfoURL,
-		"logout_url":       req.LogoutURL,
-		"user_name_field":  req.UserNameField,
-		"user_email_field": req.UserEmailField,
-		"user_id_field":    req.UserIDField,
+		"server_url":        req.ServerURL,
+		"authorize_url":     req.AuthorizeURL,
+		"token_url":         req.TokenURL,
+		"userinfo_url":      req.UserinfoURL,
+		"logout_url":        req.LogoutURL,
+		"discovery_url":     req.DiscoveryURL,
+		"user_name_field":   req.UserNameField,
+		"user_email_field":  req.UserEmailField,
+		"user_id_field":     req.UserIDField,
+		"scope":             req.Scope,
+		"token_auth_method": req.TokenAuthMethod,
+		"redirect_uri":      req.RedirectUri,
 	})
 	if err != nil {
 		global.GVA_LOG.Error("序列化OAuth2配置失败!", zap.Error(err))

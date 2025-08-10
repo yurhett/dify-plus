@@ -4,6 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
+
 	"github.com/faabiosr/cachego/file"
 	"github.com/fastwego/dingding"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -12,11 +18,6 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
-	"net/url"
-	"os"
-	"strings"
 )
 
 type SystemIntegratedService struct{}
@@ -192,10 +193,17 @@ func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemInte
 	// 合成请求byte
 	formData := url.Values{}
 	formData.Set("grant_type", "authorization_code")
-	formData.Set("client_secret", integrate.AppSecret)
-	formData.Set("client_id", integrate.AppID)
-	formData.Set("redirect_uri", "")
 	formData.Set("code", code)
+	// redirect_uri 必须与授权时一致
+	formData.Set("redirect_uri", strings.TrimSpace(configMap.RedirectUri))
+	// 支持basic与post两种认证方式
+	// 默认使用client_secret_post，除非配置为basic
+	tokenAuthMethod := strings.ToLower(strings.TrimSpace(configMap.TokenAuthMethod))
+	useBasic := tokenAuthMethod == "client_secret_basic"
+	if !useBasic {
+		formData.Set("client_secret", integrate.AppSecret)
+		formData.Set("client_id", integrate.AppID)
+	}
 
 	// 发送请求
 	var req *http.Request
@@ -207,8 +215,13 @@ func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemInte
 		return errors.New(fmt.Sprintf("创建测试请求失败: %s", err.Error()))
 	}
 
-	// 设置Content-Type
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	// 设置认证与Content-Type
+	if useBasic {
+		req.SetBasicAuth(integrate.AppID, integrate.AppSecret)
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	} else {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 
 	// 发送请求
 	resp, err := client.Do(req)

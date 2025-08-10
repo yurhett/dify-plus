@@ -74,9 +74,27 @@
                 <span v-else class="info-value">{{ config.token_url || '未配置' }}</span>
               </div>
               <div class="flex items-center mb-4">
+                <span class="info-label">Scope:</span>
+                <el-input v-if="openEdit" v-model="config.scope" class="info-value flex-1" placeholder="例如: openid profile email" />
+                <span v-else class="info-value">{{ config.scope || 'openid profile email' }}</span>
+              </div>
+              <div class="flex items-center mb-4">
+                <span class="info-label">令牌端点认证方式:</span>
+                <el-select v-if="openEdit" v-model="config.token_auth_method" class="info-value flex-1" placeholder="client_secret_post">
+                  <el-option label="client_secret_post" value="client_secret_post" />
+                  <el-option label="client_secret_basic" value="client_secret_basic" />
+                </el-select>
+                <span v-else class="info-value">{{ config.token_auth_method || 'client_secret_post' }}</span>
+              </div>
+              <div class="flex items-center mb-4">
                 <span class="info-label">获取用户信息 URL:</span>
                 <el-input v-if="openEdit" v-model="config.userinfo_url" class="info-value flex-1" placeholder="例如: /oauth2/userinfo" />
                 <span v-else class="info-value">{{ config.userinfo_url || '未配置' }}</span>
+              </div>
+              <div class="flex items-center mb-4">
+                <span class="info-label">OIDC 发现配置 URL (.well-known):</span>
+                <el-input v-if="openEdit" v-model="config.discovery_url" class="info-value flex-1" placeholder="例如: /.well-known/openid-configuration" />
+                <span v-else class="info-value">{{ config.discovery_url || '未配置' }}</span>
               </div>
               <div class="flex items-center mb-4">
                 <span class="info-label">退出登录回调 URL:</span>
@@ -180,6 +198,10 @@ const config = ref({
   user_name_field: "",
   user_email_field: "",
   user_id_field: "",
+    scope: "",
+    token_auth_method: "client_secret_post",
+    redirect_uri: "",
+    discovery_url: "",
   test: false,
 })
 
@@ -224,10 +246,13 @@ const copyHost = () => {
 
 // 测试连接
 const testConnection = async () => {
-  let host = config.value.server_url
-  let authorizeUrl = `${host}${config.value.authorize_url}`
-  let redirectUri = encodeURIComponent(`${location.protocol}//${location.host}/api/base/auth2/callback`)
-  window.open(`${authorizeUrl}?client_id=${config.value.app_id}&response_type=code&scope=all&redirect_uri=${redirectUri}`)
+  const base = config.value.server_url || ''
+  const authPath = config.value.authorize_url || ''
+  let authorizeUrl = authPath.startsWith('http://') || authPath.startsWith('https://') ? authPath : `${base}${authPath}`
+  let redirectUriRaw = config.value.redirect_uri || `${location.protocol}//${location.host}/api/base/auth2/callback`
+  let redirectUri = encodeURIComponent(redirectUriRaw)
+  let scope = encodeURIComponent(config.value.scope || 'openid profile email')
+  window.open(`${authorizeUrl}?client_id=${encodeURIComponent(config.value.app_id)}&response_type=code&scope=${scope}&redirect_uri=${redirectUri}`)
 }
 
 const initForm = async() => {

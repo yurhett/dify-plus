@@ -25,6 +25,8 @@ from services.feature_service import FeatureService
 
 from .. import api
 
+logger = logging.getLogger(__name__)
+
 
 def get_oauth_providers():
     with current_app.app_context():
@@ -74,12 +76,27 @@ class OAuthCallback(Resource):
 
         code = request.args.get("code")
         state = request.args.get("state")
+        # Fallback: some providers may return tokens directly in query (implicit/hybrid flow)
+        token_from_query: Optional[str] = None
+        if not code:
+            token_from_query = request.args.get("access_token")
+            if token_from_query:
+                logger.warning(
+                    "oauth.callback_no_code_but_token",
+                    extra={
+                        "provider": provider,
+                        "full_url": request.url,
+                        "note": "Using access_token from query as fallback. Prefer Authorization Code flow.",
+                    },
+                )
+            else:
+                return {"error": "Missing authorization code"}, 400
         invite_token = None
         if state:
             invite_token = state
 
         try:
-            token = oauth_provider.get_access_token(code)
+            token = token_from_query or oauth_provider.get_access_token(code)  # type: ignore[arg-type]
             user_info = oauth_provider.get_user_info(token)
         except requests.exceptions.RequestException as e:
             error_text = e.response.text if e.response else str(e)

@@ -1,5 +1,4 @@
 import json
-import logging  # 二开部分，针对oa登录报错问题，记录返回的code
 import urllib.parse
 from dataclasses import dataclass
 from typing import Optional
@@ -278,6 +277,9 @@ class OaOAuth(OAuth):
             })
             auth = None
 
+        if not code:
+            return ""
+
         response = requests.post(token_url, data=data, headers=headers, auth=auth)
         response.encoding = "utf-8"
         if response.status_code != 200:
@@ -297,11 +299,13 @@ class OaOAuth(OAuth):
         config = auto2_conf.get('config')
         endpoints = self._resolve_endpoints(config)
         headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(endpoints.get('userinfo_url'), headers=headers)
+        userinfo_url = endpoints.get('userinfo_url')
+        response = requests.get(userinfo_url, headers=headers)
         response.raise_for_status()
         return response.json()
 
     def _transform_user_info(self, raw_info: dict) -> OAuthUserInfo:
+        
         # 检查 raw_info 是否为空或为 None
         auto2_conf = self.get_auto2_conf()
         if not raw_info or not isinstance(raw_info, dict) or auto2_conf.get('integration') is None:

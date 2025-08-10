@@ -458,7 +458,7 @@ x-shared-env: &shared-api-worker-env
 services:
   # API service
   api:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.1
     restart: always
     environment:
       # Use the shared environment variables.
@@ -488,7 +488,7 @@ services:
   # worker service
   # The Celery worker for processing the queue.
   worker:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.1
     restart: always
     environment:
       # Use the shared environment variables.
@@ -513,7 +513,7 @@ services:
   # beat service
   # The Celery worker for schedule tasks.
   beat:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-api:1.2.1
     restart: always
     environment:
       # Use the shared environment variables.
@@ -1129,7 +1129,7 @@ services:
 
   # Extend - admin-web
   admin-web:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-web:1.2.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-web:1.2.1
     restart: always
     ports:
       - '8081:8081'
@@ -1141,7 +1141,7 @@ services:
 
   # Extend - admin-server
   admin-server:
-    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-server:1.2.0
+    image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-server:1.2.1
     restart: always
     ports:
       - '8888:8888'

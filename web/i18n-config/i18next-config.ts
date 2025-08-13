@@ -16,6 +16,7 @@ const requireSilent = async (lang: string, namespace: string) => {
 }
 
 const NAMESPACES = [
+  'extend', // 二开部分：新增的多语言
   'app-annotation',
   'app-api',
   'app-debug',

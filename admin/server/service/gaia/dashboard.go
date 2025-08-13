@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gaia"
 	gaiaReq "github.com/flipped-aurora/gin-vue-admin/server/model/gaia/request"
@@ -12,7 +14,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"time"
 )
 
 type DashboardService struct{}
@@ -101,14 +102,18 @@ func (dashboardService *DashboardService) GetAppQuotaRankingData(info gaiaReq.Ge
 		Select("" +
 			"app_id, " +
 			"COUNT(id) as message_num, " +
-			"SUM(total_price) as message_cost").
+			"SUM(CASE WHEN currency = 'RMB' THEN total_price / 7.26 ELSE total_price END) as message_cost").
 		Group("app_id")
 
 	workflowCosts := global.GVA_DB.Table("public.workflow_node_executions").
 		Select("" +
 			"app_id, " +
 			"COUNT(id) as workflow_num, " +
-			"SUM(CAST((execution_metadata::json->>'total_price') AS NUMERIC)) AS workflow_cost").
+			"SUM(CASE " +
+			"  WHEN execution_metadata::json->>'currency' = 'RMB' " +
+			"  THEN CAST((execution_metadata::json->>'total_price') AS NUMERIC) / 7.26 " +
+			"  ELSE CAST((execution_metadata::json->>'total_price') AS NUMERIC) " +
+			"END) AS workflow_cost").
 		Where("execution_metadata IS NOT NULL AND execution_metadata != '' AND (execution_metadata::json->>'total_price') IS NOT NULL").
 		Group("app_id")
 

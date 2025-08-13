@@ -58,6 +58,7 @@ from .app import (
     conversation_variables,
     ding_talk_extend,  # Extend: DingTalk Related APIs
     generator,
+    mcp_server,
     message,
     model_config,
     ops_trace,
@@ -66,6 +67,7 @@ from .app import (
     statistic,
     workflow,
     workflow_app_log,
+    workflow_draft_variable,
     workflow_run,
     workflow_statistic,
 )
@@ -85,6 +87,7 @@ from .datasets import (
     external,
     hit_testing,
     metadata,
+    upload_file,
     website,
 )
 

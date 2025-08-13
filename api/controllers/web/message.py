@@ -1,10 +1,9 @@
 import logging
 
-from flask_restful import fields, marshal_with, reqparse  # type: ignore
-from flask_restful.inputs import int_range  # type: ignore
+from flask_restful import fields, marshal_with, reqparse
+from flask_restful.inputs import int_range
 from werkzeug.exceptions import InternalServerError, NotFound
 
-import services
 from controllers.web import api
 from controllers.web.error import (
     AppMoreLikeThisDisabledError,
@@ -29,7 +28,11 @@ from models.model import AppMode
 from services.app_generate_service import AppGenerateService
 from services.errors.app import MoreLikeThisDisabledError
 from services.errors.conversation import ConversationNotExistsError
-from services.errors.message import MessageNotExistsError, SuggestedQuestionsAfterAnswerDisabledError
+from services.errors.message import (
+    FirstMessageNotExistsError,
+    MessageNotExistsError,
+    SuggestedQuestionsAfterAnswerDisabledError,
+)
 from services.message_service import MessageService
 
 
@@ -46,6 +49,7 @@ class MessageListApi(WebApiResource):
         "retriever_resources": fields.List(fields.Nested(retriever_resource_fields)),
         "created_at": TimestampField,
         "agent_thoughts": fields.List(fields.Nested(agent_thought_fields)),
+        "metadata": fields.Raw(attribute="message_metadata_dict"),
         "status": fields.String,
         "error": fields.String,
     }
@@ -72,9 +76,9 @@ class MessageListApi(WebApiResource):
             return MessageService.pagination_by_first_id(
                 app_model, end_user, args["conversation_id"], args["first_id"], args["limit"]
             )
-        except services.errors.conversation.ConversationNotExistsError:
+        except ConversationNotExistsError:
             raise NotFound("Conversation Not Exists.")
-        except services.errors.message.FirstMessageNotExistsError:
+        except FirstMessageNotExistsError:
             raise NotFound("First Message Not Exists.")
 
 
@@ -95,7 +99,7 @@ class MessageFeedbackApi(WebApiResource):
                 rating=args.get("rating"),
                 content=args.get("content"),
             )
-        except services.errors.message.MessageNotExistsError:
+        except MessageNotExistsError:
             raise NotFound("Message Not Exists.")
 
         return {"result": "success"}

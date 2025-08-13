@@ -1,7 +1,7 @@
 import logging
 
 from flask import request  # ----------------- start You must log in to access your account extend ---------------
-from flask_restful import reqparse  # type: ignore
+from flask_restful import reqparse
 from werkzeug.exceptions import InternalServerError, NotFound
 
 import services

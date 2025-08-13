@@ -21,6 +21,7 @@ def init_app(app: DifyApp) -> Celery:
             "master_name": dify_config.CELERY_SENTINEL_MASTER_NAME,
             "sentinel_kwargs": {
                 "socket_timeout": dify_config.CELERY_SENTINEL_SOCKET_TIMEOUT,
+                "password": dify_config.CELERY_SENTINEL_PASSWORD,
             },
         }
 
@@ -63,63 +64,86 @@ def init_app(app: DifyApp) -> Celery:
     celery_app.set_default()
     app.extensions["celery"] = celery_app
 
-    imports = [
-        "schedule.clean_embedding_cache_task",
-        "schedule.clean_unused_datasets_task",
-        "schedule.create_tidb_serverless_task",
-        "schedule.update_tidb_serverless_status_task",
-        "schedule.clean_messages",
-        "schedule.mail_clean_document_notify_task",
-        "schedule.update_account_used_quota_extend",  # 二开部分 每月重置账号额度
-        "schedule.update_api_token_daily_used_quota_task_extend",  # 二开部分 重置密钥日额度
-        "schedule.update_api_token_monthly_used_quota_task_extend",  # 二开部分 重置密钥月额度
-    ]
+    imports = []
     day = dify_config.CELERY_BEAT_SCHEDULER_TIME
-    beat_schedule = {
-        "clean_embedding_cache_task": {
+
+    # if you add a new task, please add the switch to CeleryScheduleTasksConfig
+    beat_schedule = {}
+    if dify_config.ENABLE_CLEAN_EMBEDDING_CACHE_TASK:
+        imports.append("schedule.clean_embedding_cache_task")
+        beat_schedule["clean_embedding_cache_task"] = {
             "task": "schedule.clean_embedding_cache_task.clean_embedding_cache_task",
-            "schedule": timedelta(days=day),
-        },
-        "clean_unused_datasets_task": {
+            "schedule": crontab(minute="0", hour="2", day_of_month=f"*/{day}"),
+        }
+    if dify_config.ENABLE_CLEAN_UNUSED_DATASETS_TASK:
+        imports.append("schedule.clean_unused_datasets_task")
+        beat_schedule["clean_unused_datasets_task"] = {
             "task": "schedule.clean_unused_datasets_task.clean_unused_datasets_task",
-            "schedule": timedelta(days=day),
-        },
-        "create_tidb_serverless_task": {
+            "schedule": crontab(minute="0", hour="3", day_of_month=f"*/{day}"),
+        }
+    if dify_config.ENABLE_CREATE_TIDB_SERVERLESS_TASK:
+        imports.append("schedule.create_tidb_serverless_task")
+        beat_schedule["create_tidb_serverless_task"] = {
             "task": "schedule.create_tidb_serverless_task.create_tidb_serverless_task",
             "schedule": crontab(minute="0", hour="*"),
-        },
-        "update_tidb_serverless_status_task": {
+        }
+    if dify_config.ENABLE_UPDATE_TIDB_SERVERLESS_STATUS_TASK:
+        imports.append("schedule.update_tidb_serverless_status_task")
+        beat_schedule["update_tidb_serverless_status_task"] = {
             "task": "schedule.update_tidb_serverless_status_task.update_tidb_serverless_status_task",
             "schedule": timedelta(minutes=10),
-        },
-        "clean_messages": {
+        }
+    if dify_config.ENABLE_CLEAN_MESSAGES:
+        imports.append("schedule.clean_messages")
+        beat_schedule["clean_messages"] = {
             "task": "schedule.clean_messages.clean_messages",
-            "schedule": timedelta(days=day),
-        },
-        # every Monday
-        "mail_clean_document_notify_task": {
+            "schedule": crontab(minute="0", hour="4", day_of_month=f"*/{day}"),
+        }
+    if dify_config.ENABLE_MAIL_CLEAN_DOCUMENT_NOTIFY_TASK:
+        imports.append("schedule.mail_clean_document_notify_task")
+        beat_schedule["mail_clean_document_notify_task"] = {
             "task": "schedule.mail_clean_document_notify_task.mail_clean_document_notify_task",
             "schedule": crontab(minute="0", hour="10", day_of_week="1"),
-        },
-        # ---------------------------- 二开部分 Begin ----------------------------
+        }
+    if dify_config.ENABLE_DATASETS_QUEUE_MONITOR:
+        imports.append("schedule.queue_monitor_task")
+        beat_schedule["datasets-queue-monitor"] = {
+            "task": "schedule.queue_monitor_task.queue_monitor_task",
+            "schedule": timedelta(
+                minutes=dify_config.QUEUE_MONITOR_INTERVAL if dify_config.QUEUE_MONITOR_INTERVAL else 30
+            ),
+        }
+    if dify_config.ENABLE_CHECK_UPGRADABLE_PLUGIN_TASK:
+        imports.append("schedule.check_upgradable_plugin_task")
+        beat_schedule["check_upgradable_plugin_task"] = {
+            "task": "schedule.check_upgradable_plugin_task.check_upgradable_plugin_task",
+            "schedule": crontab(minute="*/15"),
+        }
+
+    # ---------------------------- 二开部分 Begin ----------------------------
+    if dify_config.ENABLE_ACCOUNT_QUOTA_EXTEND_TASK:
         # 每月1号00:00，重置账号额度
-        "update_account_used_quota": {
+        imports.append("schedule.update_account_used_quota_extend")
+        beat_schedule["update_account_used_quota_extend"] = {
             "task": "schedule.update_account_used_quota_extend.update_account_used_quota_extend",
             "schedule": crontab(minute="0", hour="0", day_of_month="1"),
-        },
-        # 每天，重置密钥日额度
-        "update_api_token_daily_used_quota_task_extend": {
-            "task": "schedule.update_api_token_daily_used_quota_task_extend.update_api_token_daily_used_quota_task_extend",
+        }
+
+        # 每天，重置账户日额度
+        imports.append("schedule.update_account_daily_used_quota_extend")
+        beat_schedule["update_account_daily_used_quota_extend"] = {
+            "task": "schedule.update_account_daily_used_quota_extend.update_account_daily_used_quota_extend",
             "schedule": timedelta(days=1),
-        },
-        # 每月1号00:00，重置密钥月额度
-        "update_api_token_monthly_used_quota_task_extend": {
-            "task": "schedule.update_api_token_monthly_used_quota_task_extend.update_api_token_monthly_used_quota_task_extend",
-            # "schedule": crontab(minute="0", hour="0", day_of_month="1"),
-            "schedule": crontab(minute="0", hour="22", day_of_month="7"),  # TODO 临时改到7号22点执行
-        },
-        # ---------------------------- 二开部分 End ----------------------------
-    }
+        }
+
+        # 每月1号00:00，重置账户月额度
+        imports.append("schedule.update_account_monthly_used_quota_extend")
+        beat_schedule["update_account_monthly_used_quota_extend"] = {
+            "task": "schedule.update_account_monthly_used_quota_extend.update_account_monthly_used_quota_extend",
+            "schedule": crontab(minute="0", hour="0", day_of_month="1"),
+        }
+   # ---------------------------- 二开部分 End ----------------------------
+
     celery_app.conf.update(beat_schedule=beat_schedule, imports=imports)
 
     return celery_app

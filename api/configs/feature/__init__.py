@@ -865,6 +865,11 @@ class CeleryScheduleTasksConfig(BaseSettings):
         description="Enable check upgradable plugin task",
         default=True,
     )
+    # 二开新增：账号额度任务开关
+    ENABLE_ACCOUNT_QUOTA_EXTEND_TASK: bool = Field(
+        description="Enable account quota task",
+        default=True,
+    )
 
 
 class PositionConfig(BaseSettings):

@@ -157,7 +157,6 @@ class WorkflowAppGenerator(BaseAppGenerator):
             trace_manager=trace_manager,
             workflow_execution_id=workflow_run_id,
             extras=extras,
-            extras=extras,  # 二开部分 - 密钥额度限制
         )
 
         contexts.plugin_tool_providers.set({})

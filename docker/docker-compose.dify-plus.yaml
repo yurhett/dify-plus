@@ -1130,8 +1130,6 @@ services:
   admin-web:
     image: ccr.ccs.tencentyun.com/yfgaia/dify-plus-admin-web:1.2.1
     restart: always
-    ports:
-      - '8081:8081'
     depends_on:
       - admin-server
     command: [ 'nginx-debug', '-g', 'daemon off;' ]

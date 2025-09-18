@@ -190,6 +190,11 @@ func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemInte
 		return errors.New("请填写完整的 OAuth2 配置信息")
 	}
 
+	// 验证URL格式
+	if !strings.HasPrefix(configMap.ServerURL, "http://") && !strings.HasPrefix(configMap.ServerURL, "https://") {
+		return errors.New("ServerURL 必须以 http:// 或 https:// 开头")
+	}
+
 	// 合成请求byte
 	formData := url.Values{}
 	formData.Set("grant_type", "authorization_code")
@@ -205,13 +210,23 @@ func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemInte
 		formData.Set("client_id", integrate.AppID)
 	}
 
+	// 构建token URL，确保正确的URL格式
+	baseURL := strings.TrimSuffix(configMap.ServerURL, "/")
+	tokenPath := strings.TrimPrefix(configMap.TokenURL, "/")
+	tokenURL := fmt.Sprintf("%s/%s", baseURL, tokenPath)
+
+	// 记录构建的URL用于调试
+	global.GVA_LOG.Info("构建OAuth2 token URL", 
+		zap.String("serverURL", configMap.ServerURL),
+		zap.String("tokenURL", configMap.TokenURL), 
+		zap.String("constructedURL", tokenURL))
+
 	// 发送请求
 	var req *http.Request
 	client := &http.Client{}
-	req, err = http.NewRequest("POST", fmt.Sprintf(
-		"%s%s", configMap.ServerURL, configMap.TokenURL), strings.NewReader(formData.Encode()))
+	req, err = http.NewRequest("POST", tokenURL, strings.NewReader(formData.Encode()))
 	if err != nil {
-		global.GVA_LOG.Error("创建测试请求失败", zap.Error(err))
+		global.GVA_LOG.Error("创建测试请求失败", zap.Error(err), zap.String("url", tokenURL))
 		return errors.New(fmt.Sprintf("创建测试请求失败: %s", err.Error()))
 	}
 
@@ -226,14 +241,17 @@ func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemInte
 	// 发送请求
 	resp, err := client.Do(req)
 	if err != nil {
-		global.GVA_LOG.Error("测试 OAuth2 连接失败", zap.Error(err))
+		global.GVA_LOG.Error("测试 OAuth2 连接失败", zap.Error(err), zap.String("url", tokenURL))
 		return errors.New(fmt.Sprintf("连接 OAuth2 服务器失败: %s", err.Error()))
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		global.GVA_LOG.Error("测试 OAuth2 连接失败", zap.Int("status", resp.StatusCode))
-		return errors.New(fmt.Sprintf("OAuth2 服务器返回错误状态码: %d", resp.StatusCode))
+		global.GVA_LOG.Error("测试 OAuth2 连接失败", 
+			zap.Int("status", resp.StatusCode), 
+			zap.String("url", tokenURL),
+			zap.String("method", "POST"))
+		return errors.New(fmt.Sprintf("OAuth2 服务器返回错误状态码: %d (URL: %s)", resp.StatusCode, tokenURL))
 	}
 	var bodyByte []byte
 	if bodyByte, err = io.ReadAll(resp.Body); err != nil {

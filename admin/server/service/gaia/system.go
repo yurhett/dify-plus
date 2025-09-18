@@ -1,6 +1,7 @@
 package gaia
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -200,7 +201,16 @@ func (e *SystemIntegratedService) TestOAuth2Connection(integrate gaia.SystemInte
 	formData.Set("grant_type", "authorization_code")
 	formData.Set("code", code)
 	// redirect_uri 必须与授权时一致
-	formData.Set("redirect_uri", strings.TrimSpace(configMap.RedirectUri))
+	redirectUri := strings.TrimSpace(configMap.RedirectUri)
+	if redirectUri == "" {
+		// 当配置中没有指定redirect_uri时，使用与前端相同的默认值
+		var host string
+		if host, _ = global.GVA_Dify_REDIS.Get(context.Background(), "api_host").Result(); len(host) == 0 {
+			host = global.GVA_CONFIG.Gaia.Url
+		}
+		redirectUri = fmt.Sprintf("%s/admin/api/base/auth2/callback", host)
+	}
+	formData.Set("redirect_uri", redirectUri)
 	// 支持basic与post两种认证方式
 	// 默认使用client_secret_post，除非配置为basic
 	tokenAuthMethod := strings.ToLower(strings.TrimSpace(configMap.TokenAuthMethod))

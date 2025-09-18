@@ -7,6 +7,7 @@ import Loading from '@/app/components/base/loading'
 import MailAndCodeAuth from './components/mail-and-code-auth'
 import MailAndPasswordAuth from './components/mail-and-password-auth'
 import SSOAuth from './components/sso-auth'
+import OAuth2 from './components/oauth2'
 import cn from '@/utils/classnames'
 import { LicenseStatus } from '@/types/feature'
 import { IS_CE_EDITION } from '@/config'
@@ -23,8 +24,8 @@ const NormalForm = () => {
 
   const init = useCallback(async () => {
     try {
-      setAllMethodsAreDisabled(!systemFeatures.enable_social_oauth_login && !systemFeatures.enable_email_code_login && !systemFeatures.enable_email_password_login && !systemFeatures.sso_enforced_for_signin)
-      setShowORLine((systemFeatures.enable_social_oauth_login || systemFeatures.sso_enforced_for_signin) && (systemFeatures.enable_email_code_login || systemFeatures.enable_email_password_login))
+      setAllMethodsAreDisabled(!systemFeatures.enable_social_oauth_login && !systemFeatures.enable_email_code_login && !systemFeatures.enable_email_password_login && !systemFeatures.sso_enforced_for_signin && !systemFeatures.is_custom_auth2)
+      setShowORLine((systemFeatures.enable_social_oauth_login || systemFeatures.sso_enforced_for_signin || systemFeatures.is_custom_auth2) && (systemFeatures.enable_email_code_login || systemFeatures.enable_email_password_login))
       updateAuthType(systemFeatures.enable_email_password_login ? 'password' : 'code')
     }
     catch (error) {
@@ -102,6 +103,9 @@ const NormalForm = () => {
             {systemFeatures.sso_enforced_for_signin && <div className='w-full'>
               <SSOAuth protocol={systemFeatures.sso_enforced_for_signin_protocol} />
             </div>}
+            {/* Extend start: oauth2 login */}
+            {systemFeatures.is_custom_auth2 && (<OAuth2 />)}
+            { /* Extend stop: oauth2 login */ }
           </div>
 
           {showORLine && <div className="relative mt-6">

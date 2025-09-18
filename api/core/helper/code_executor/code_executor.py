@@ -15,6 +15,8 @@ from core.helper.code_executor.python3.python3_transformer import Python3Templat
 from core.helper.code_executor.template_transformer import TemplateTransformer
 
 logger = logging.getLogger(__name__)
+code_execution_endpoint_url = URL(str(dify_config.CODE_EXECUTION_ENDPOINT))
+full_code_execution_endpoint_url = URL(str(dify_config.FULL_CODE_EXECUTION_ENDPOINT))
 
 
 class CodeExecutionError(Exception):
@@ -65,7 +67,10 @@ class CodeExecutor:
         :param code: code
         :return:
         """
-        url = URL(dify_config.FULL_CODE_EXECUTION_ENDPOINT if purview else str(dify_config.CODE_EXECUTION_ENDPOINT)) / "v1" / "sandbox" / "run"  # Extend global code
+        url = code_execution_endpoint_url / "v1" / "sandbox" / "run"
+        # # Extend global code
+        if purview:
+            url = full_code_execution_endpoint_url / "v1" / "sandbox" / "run"
 
         headers = {"X-Api-Key": dify_config.CODE_EXECUTION_API_KEY}
 

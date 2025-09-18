@@ -101,7 +101,7 @@ class ModelInstance:
     @overload
     def invoke_llm(
         self,
-        prompt_messages: list[PromptMessage],
+        prompt_messages: Sequence[PromptMessage],
         model_parameters: Optional[dict] = None,
         tools: Sequence[PromptMessageTool] | None = None,
         stop: Optional[list[str]] = None,
@@ -177,7 +177,7 @@ class ModelInstance:
         )
 
     def get_llm_num_tokens(
-        self, prompt_messages: list[PromptMessage], tools: Optional[list[PromptMessageTool]] = None
+        self, prompt_messages: Sequence[PromptMessage], tools: Optional[Sequence[PromptMessageTool]] = None
     ) -> int:
         """
         Get number of tokens for llm
@@ -535,14 +535,22 @@ class LBModelManager:
 
             if dify_config.DEBUG:
                 logger.info(
-                    f"Model LB\nid: {config.id}\nname:{config.name}\n"
-                    f"tenant_id: {self._tenant_id}\nprovider: {self._provider}\n"
-                    f"model_type: {self._model_type.value}\nmodel: {self._model}"
+                    """Model LB
+id: %s
+name:%s
+tenant_id: %s
+provider: %s
+model_type: %s
+model: %s""",
+                    config.id,
+                    config.name,
+                    self._tenant_id,
+                    self._provider,
+                    self._model_type.value,
+                    self._model,
                 )
 
             return config
-
-        return None
 
     def cooldown(self, config: ModelLoadBalancingConfiguration, expire: int = 60) -> None:
         """

@@ -1,10 +1,15 @@
 .githubIcon {
-    background: center/contain url('./assets/github.svg');
+  background: center/contain url('./assets/github.svg') no-repeat;
+}
+
+html[data-theme="dark"] .githubIcon {
+  background: center/contain url('./assets/github-dark.svg') no-repeat;
 }
 
 .googleIcon {
-    background: center/contain url('./assets/google.svg');
+  background: center/contain url('./assets/google.svg') no-repeat;
 }
+
 
 /* Extend: start 钉钉快捷登录按钮 */
 .dingIcon {

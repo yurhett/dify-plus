@@ -45,27 +45,13 @@ class AgentChatAppRunner(AppRunner):
         app_config = application_generate_entity.app_config
         app_config = cast(AgentChatAppConfig, app_config)
 
-        app_record = db.session.query(App).filter(App.id == app_config.app_id).first()
+        app_record = db.session.query(App).where(App.id == app_config.app_id).first()
         if not app_record:
             raise ValueError("App not found")
 
         inputs = application_generate_entity.inputs
         query = application_generate_entity.query
         files = application_generate_entity.files
-
-        # Pre-calculate the number of tokens of the prompt messages,
-        # and return the rest number of tokens by model context token size limit and max token size limit.
-        # If the rest number of tokens is not enough, raise exception.
-        # Include: prompt template, inputs, query(optional), files(optional)
-        # Not Include: memory, external data, dataset context
-        self.get_pre_calculate_rest_tokens(
-            app_record=app_record,
-            model_config=application_generate_entity.model_conf,
-            prompt_template_entity=app_config.prompt_template,
-            inputs=dict(inputs),
-            files=list(files),
-            query=query,
-        )
 
         memory = None
         if application_generate_entity.conversation_id:
@@ -197,10 +183,10 @@ class AgentChatAppRunner(AppRunner):
         if {ModelFeature.MULTI_TOOL_CALL, ModelFeature.TOOL_CALL}.intersection(model_schema.features or []):
             agent_entity.strategy = AgentEntity.Strategy.FUNCTION_CALLING
 
-        conversation_result = db.session.query(Conversation).filter(Conversation.id == conversation.id).first()
+        conversation_result = db.session.query(Conversation).where(Conversation.id == conversation.id).first()
         if conversation_result is None:
             raise ValueError("Conversation not found")
-        message_result = db.session.query(Message).filter(Message.id == message.id).first()
+        message_result = db.session.query(Message).where(Message.id == message.id).first()
         if message_result is None:
             raise ValueError("Message not found")
         db.session.close()

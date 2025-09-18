@@ -1,10 +1,10 @@
-name: Build and Push API & Web
+name: Build and Push API & Web & Admin
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version number'
+        description: 'Version number (e.g. v1.7.2)'
         required: true
         default: 'latest'
 
@@ -30,6 +30,14 @@ jobs:
           - service_name: "build-web-amd64"
             component: "web"
             context: "web"
+            platform: linux/amd64
+          - service_name: "build-admin-server-amd64"
+            component: "admin-server"
+            context: "admin/server"
+            platform: linux/amd64
+          - service_name: "build-admin-web-amd64"
+            component: "admin-web"
+            context: "admin/web"
             platform: linux/amd64
 
     steps:
@@ -95,6 +103,10 @@ jobs:
             context: "api"
           - component: "web"
             context: "web"
+          - component: "admin-server"
+            context: "admin/server"
+          - component: "admin-web"
+            context: "admin/web"
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4

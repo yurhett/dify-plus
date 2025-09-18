@@ -1,13 +1,8 @@
 name: Build docker image
 
 on:
-  pull_request:
-    branches:
-      - "main"
-    paths:
-      - api/Dockerfile
-      - web/Dockerfile
-
+  workflow_dispatch:
+  
 concurrency:
   group: docker-build-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -21,15 +16,10 @@ jobs:
           - service_name: "api-amd64"
             platform: linux/amd64
             context: "api"
-          - service_name: "api-arm64"
-            platform: linux/arm64
-            context: "api"
           - service_name: "web-amd64"
             platform: linux/amd64
             context: "web"
-          - service_name: "web-arm64"
-            platform: linux/arm64
-            context: "web"
+
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

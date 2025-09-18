@@ -148,7 +148,10 @@ class OaOAuth(OAuth):
             return ""
         if self._is_absolute_url(path_or_url):
             return path_or_url
-        return f"{base}{path_or_url}"
+        # Ensure proper URL joining by handling trailing/leading slashes
+        base = base.rstrip('/')
+        path_or_url = path_or_url.lstrip('/')
+        return f"{base}/{path_or_url}"
 
     def _resolve_endpoints(self, config: dict) -> dict:
         """
